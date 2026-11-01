@@ -19,7 +19,7 @@
 - [六、實驗設計與評估](#六實驗設計與評估)
 - [七、專案檔案導覽](#七專案檔案導覽)
 - [八、整合規畫與限制](#八整合規畫與限制)
-- [九、組員與分工](#九組員與分工)
+- [九、組員資料](#九組員資料)
 - [十、資料來源、AI 使用與授權](#十資料來源ai-使用與授權)
 
 ## 一、專題背景與目標
@@ -172,7 +172,7 @@ B0 沒有自然語言輸入，所以語言處理正確率只比較 B1 與 B2。�
 | [`docs/TB3_Proposal.pptx`](docs/TB3_Proposal.pptx) | 提案簡報 |
 | [`docs/INTERFACES.md`](docs/INTERFACES.md) | 工具與導航介面規格 |
 | [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md) | 比較實驗與評估方法 |
-| [`docs/TEAM.md`](docs/TEAM.md) | 組員資料與預計工作角色 |
+| [`docs/TEAM.md`](docs/TEAM.md) | 組員姓名與學號 |
 | [`docs/REFERENCES.md`](docs/REFERENCES.md) | 參考資料 |
 | [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | 繳交檢查表 |
 | [`assets/`](assets/) | 架構與流程圖片 |
@@ -191,7 +191,7 @@ B0 沒有自然語言輸入，所以語言處理正確率只比較 B1 與 B2。�
 
 ROS 2 與 Gazebo 的具體組合仍需與實機環境核對，對應啟動指令將於整合驗證後補上。LLM 服務與澄清可能增加互動延遲，地點查詢與雷射感測也各有適用範圍，後續評估會一併揭露。
 
-## 九、組員與分工
+## 九、組員資料
 
 **第 7 組**
 
@@ -203,7 +203,7 @@ ROS 2 與 Gazebo 的具體組合仍需與實機環境核對，對應啟動指令
 | 邱原美 | 7115064159 |
 | 官奕愷 | 7115093001 |
 
-預計工作涵蓋領域研究、AI 文獻與 LLM、Agent 與工具介面、ROS 2／Nav2 整合及實驗評估。個人工作角色待全組確認，詳見 [TEAM.md](docs/TEAM.md)。
+組員姓名與學號另見 [TEAM.md](docs/TEAM.md)。
 
 ## 十、資料來源、AI 使用與授權
 
