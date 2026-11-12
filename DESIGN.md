@@ -1,5 +1,7 @@
 # 系統設計文件
 
+DIC3（2026-11-12）：本文件保留系統設計脈絡；轉換後的 OpenSpec [設計與章節對照](openspec/changes/refactor-tb3-proposal/design.md)、[需求與情境](openspec/changes/refactor-tb3-proposal/specs/navigation-mission/spec.md)、[任務清單](openspec/changes/refactor-tb3-proposal/tasks.md) 及 [操作說明](docs/DIC3_OPENSPEC.md) 為本次新增。現有離線行為見 openspec/specs/offline-contract；完整導航仍待實作。
+
 ## 1 問題與需求
 
 以 TurtleBot3 Burger 為平台之室內導航與任務決策 AI Agent。任務層需要處理語意歧義、未知地點、狀態異常與結果回報。
@@ -110,9 +112,9 @@ Output: mission result R with evidence E
 15: while mission deadline has not expired:
 16:     read navigation feedback and fresh status; append evidence
 17:     if user cancels or status is unsafe/stale:
-18:         cancel goal; verify response; return CANCELED or FAULT
+18:         cancel goal; verify response; return CANCELED only if cancellation and stopping are confirmed, otherwise FAULT
 19:     if navigation result is SUCCEEDED:
-20:         return ARRIVED with action result and observed final pose
+20:         return ARRIVED if fresh final pose meets tolerances, else FAULT
 21:     if navigation result is FAILED or CANCELED:
 22:         if FAILED and retry budget remains and fresh checks pass:
 23:             recheck path; retry once only when a valid path exists
@@ -122,7 +124,7 @@ Output: mission result R with evidence E
 ```
 
 「最多一次」指 Nav2 自己的行為樹恢復已終止後，Agent 最多再派送一次；不是無限疊加恢復。
-取消優先於新任務。未收到終止或停止確認時回報未確認，不能聲稱已停止。
+取消優先於新任務。未收到終止或停止確認時回報未確認，不能聲稱已停止；未確認狀態阻擋新移動任務。任務逾時仍回報 TIMEOUT，附上終止／停止確認資訊。
 
 ## 9 Interfaces
 

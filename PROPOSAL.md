@@ -6,72 +6,107 @@
 
 Indoor Navigation and Task Decision Agent for TurtleBot3 Burger
 
-期中分組 Proposal｜五人專題｜2026 年 10 月 30 日
+DIC3 Proposal Refactor｜第 7 組專題｜2026 年 11 月 12 日
 
-組別與五位組員姓名／學號：繳交前填入實際資料。
+本版整理：蕭丞皓（7115064186）。原分組名單與分工見 [TEAM.md](docs/TEAM.md)。本文件是 DIC3 改版文字；PDF／PPTX 保留期中版本。
 
-### 一、摘要 Abstract
+## 一、摘要 Abstract
 
-A 動機：2025 年語言模型與 ROS 2 整合研究已將延遲列為機器人互動的重要問題 [3]；2026 年 BARN 挑戰仍以狹窄環境中的可靠導航為課題 [12]。對剛接觸漢堡小車的使用者而言，完成一次移動還需要理解地點、確認狀態並處理失敗。
+### 1.1 A–F 結構化摘要
 
-B 挑戰：自然語言的地點可能含糊，模型也可能提出環境中不存在的目標；單純轉送指令無法保證導航完成，更無法保證回報正確。
+**A — Attention Getter（重要性）**  
+機器人接受一句「去門口」後，必須將語意連到具體地點與實際執行。2025 年語言導航研究仍關注 LLM 與 ROS 2 的互動延遲 [3]；BARN 2026 則持續以狹窄環境測試導航系統 [12]。本專題聚焦實驗室使用者從提出任務到確認結果的完整流程。
 
-C 解法：本專題提出以 TurtleBot3 Burger 為平台的室內導航與任務決策 AI Agent，讓使用者以中文指定已登錄的地點，並取得有執行依據的任務回報。
+**B — But（挑戰）**  
+同一名稱可能對應多個地點，未知目的地不能靠模型猜測；即使目標正確，定位、雷射或通訊異常也可能使任務不可執行。語言輸出、派送受理與實際到達是不同事件，必須分別驗證。
 
-D 方法：系統結合 LLM 結構化解析、地點與領域知識檢索、狀態檢查、Nav2 工具呼叫及事件紀錄。底層控制由導航模組執行；Agent 根據回饋澄清、拒絕、派送或回報。
+**C — Cure（解法）**  
+提出以 TurtleBot3 Burger 為平台的中文室內導航與任務決策 AI Agent。核心設計是「LLM 負責理解，驗證層限制工具，Nav2 負責導航，觀測證據決定回報」。
 
-E 評估：預計建立 60 筆中文指令及四類導航場景，固定 Nav2 設定，比較固定介面、直接語言轉目標及完整 Agent。量測任務完成、錯誤派送、回報正確性、延遲、碰撞與到達表現。
+**D — Development（方法）**  
+採八模組架構：輸入情境、結構化解析、任務 Agent、資料檢索、分析引擎、領域驗證、導航工具與輸出互動。以命名地點表限制目標，歧義時先澄清，派送前檢查狀態與路徑，執行中監控並處理取消、逾時及一次以內的 Agent 重試。OpenSpec 將這些行為轉成可驗收需求。
 
-F 預期成果：預期減少歧義指令造成的不當派送，提升失敗回報的可追溯性，並完成可重現的實驗與文件。本提案尚未產生導航實驗結果，所有效益均待驗證。
+**E — Experiments（評估）**  
+預計建立 60 筆繁體中文指令，以語意模板分成 20 筆開發與 40 筆鎖定測試；在固定 Nav2 下比較 B0 地點選單、B1 直接語言轉目標及 B2 完整 Agent。語言處理只比較 B1/B2；導航另依四類情境與配對起終點評估。指標涵蓋處理正確率、不當派送率、任務完成率、回報正確率與延遲，並執行澄清與前置檢查消融。
+
+**F — Findings（預期產出）**  
+預期產出中文任務介面、受限工具流程、可追溯紀錄、OpenSpec 規格及可重現評估。預期澄清與檢查能降低不當派送，但可能增加互動時間；效益仍待測試。本版本完成提案與離線原型，尚無 LLM、模擬導航或實機比較結果。
+
+### 1.2 中文摘要
+
+室內移動機器人除了規劃路徑，也必須理解使用者意圖、確認執行條件並正確回報結果。「去門口」可能對應多個位置，定位或感測資料過期亦可能造成不當派送。本專題提出以 TurtleBot3 Burger 為平台的中文導航與任務決策 AI Agent，結合大型語言模型的結構化解析、命名地點檢索、工具白名單及 ROS 2／Nav2。系統在歧義時主動澄清，派送前檢查狀態與路徑，執行中監控任務，並以導航結果與現場觀測區分到達、取消、失敗及逾時。研究將透過六十筆中文指令與四類導航情境，在固定導航設定下比較地點選單、直接語言轉目標及完整 Agent，量測不當派送、完成率、回報一致性與延遲。預期產出可追溯、可驗收且可重現的任務介面；目前僅有離線原型，整合效益仍待實驗驗證。
+
+### 1.3 IEEE-style English Abstract
+
+**Title—An Evidence-Grounded Chinese-Language Task Agent for Indoor Navigation With TurtleBot3 Burger**
+
+**Abstract—** Natural-language interfaces can simplify indoor robot operation, but converting a request into a navigation goal does not establish that the destination is unambiguous, the robot is ready, or the mission has succeeded. This project proposes a Chinese-language task agent for TurtleBot3 Burger that separates language interpretation, constrained tool execution, and evidence-based reporting. A large language model produces structured intents, while a registered landmark catalog and schema validation restrict admissible destinations and requests. The planned workflow clarifies ambiguous references, checks localization and sensor freshness, verifies path availability, and delegates navigation to ROS 2 and Nav2. Mission monitoring distinguishes arrival, cancellation, failure, and timeout; successful arrival requires both a successful navigation result and a verified endpoint. OpenSpec requirements and scenarios formalize these behaviors and their acceptance criteria. Evaluation will use 60 Chinese commands divided by semantic template into 20 development and 40 held-out test cases, together with four navigation scenario categories. A destination menu, direct language-to-goal interface, and complete agent will share navigation settings. Metrics will assess handling correctness, inappropriate dispatch, mission completion, reporting consistency, and latency. The expected contribution is a traceable task interface and reproducible evaluation design. The current implementation is an offline prototype; integrated navigation performance remains to be established experimentally.
+
+**Index Terms—** Indoor navigation, task agents, large language models, TurtleBot3, ROS 2, specification-driven development.
 
 ## 二、緒論 Introduction
 
-### 2.1 動機與背景
+### 2.1 背景與動機
 
-TurtleBot3 Burger 是本專題的室內移動機器人平台。使用者以已建立的地圖和命名地點指定任務，系統再透過定位、規劃與控制完成移動。研究重點是讓任務從人類語言銜接至可驗證的執行結果，而不是重新發明底層導航演算法。
+在實驗室的室內移動情境中，使用者希望以「到書桌旁」等中文指令指定目的地，而不必操作地圖座標。導航模組可以處理已知目標的規劃與控制，但任務介面仍須回答：指令對應哪個地點？現在是否適合啟動？最後實際發生什麼事？本專題以 TurtleBot3 Burger 作為平台，研究從自然語言到任務回報的可驗證銜接。
 
-近期研究 [3] 顯示語言介面與 ROS 2 的整合仍須處理延遲；BARN 2026 持續比較不同導航方法，反映複雜環境仍有可靠性挑戰 [12]。兩者共同支持本專題同時關注互動與物理執行，而不只展示一個能回答問題的介面。
+此問題同時涉及語言與物理執行。SayCan 將語言規劃與機器人技能可行性結合 [2]；The Marathon 2 說明以行為樹協調 ROS 2 導航 [4]。2025 年 Pollini 等人的工作則顯示語言模型與 ROS 2 的整合需要量測通訊延遲 [3]。因此，本專題除了讓指令能被解析，也關注澄清、派送條件與結果證據。
 
-### 2.2 問題定義
+### 2.2 問題定義與研究問題
 
-目標使用者為實驗室學生與小車操作新手。給定中文任務、已登錄地點、地圖及機器人狀態，系統必須決定是否需要澄清、能否派送導航，以及最後應回報到達、取消、失敗或逾時。
+給定中文請求 Q、命名地點表 K、目前地圖 M 與帶時間戳的機器人狀態 S，系統需決定澄清、拒絕、派送、取消或回報，並讓每個可執行決策具有可核對依據。輸出不能以模型的語言判斷替代實際 action 與感測觀測。
 
-### 2.3 現有方法的限制
+| 編號 | 研究問題 | 預計驗證方式 |
+|---|---|---|
+| RQ1 | 澄清是否減少歧義及未知目的地造成的不當派送？ | B1/B2 與移除澄清的消融；對照人工標註 |
+| RQ2 | 前置狀態檢查是否降低故障情境中的派送？ | 固定故障注入，比較有／無 Agent 前置檢查 |
+| RQ3 | 證據回報是否提升狀態一致性，付出多少延遲？ | 回報與 action／事件核對，量測解析、派送及回報延遲 |
 
-Nav2 解決導航執行，但不直接處理中文指令歧義；LLM 能解析語言，卻不能把語言合理性當成動作可行性的證據 [2][4]。若只做「文字轉座標」，還可能出現不存在的地點、過期狀態、重複派送，以及任務尚未成功卻聲稱到達的問題。這些是本專題要測試的系統風險，不代表所有既有系統都有相同缺陷。
+### 2.3 現有方法與研究缺口
+
+ReAct 支持行動與觀測交替的代理模式 [1]，SayCan 強調語言決策須連到可執行能力 [2]，Nav2 則提供模組化導航基礎 [4]。這些工作各有不同平台與任務，並未直接回答本組在固定 Burger／Nav2 條件下，上述三項機制對中文室內任務的增益。本專題將此定位為可量測的系統整合問題，不宣稱既有研究完全缺少澄清或失敗處理。
 
 ### 2.4 設計特色與預期貢獻
 
-本專題的貢獻定位為教學與實驗室場景的系統整合，不宣稱首次提出 LLM 導航。預計完成：一套經白名單驗證的中文任務介面；一個整合定位與感測檢查的任務管理器；一份以導航回饋為依據的結果紀錄；以及可區分語言層與導航層成效的比較實驗。
+1. **受限中文任務介面：** 將語意映射到已登錄地點，模糊先澄清，非法參數不派送。
+2. **狀態感知的任務生命週期：** 統一管理派送、監控、取消、逾時與有限重試。
+3. **依證據產生回報：** 分開 action 成功、終點符合與停止確認，保存可追溯事件。
+4. **可重現的分層評估：** 共用導航底層，分別量測語言處理、任務與回報；以 OpenSpec 對應需求與驗收。
 
-### 2.5 範圍
+以上均為預期產出；程式目前只完成離線 JSON 驗證與 mock 結果，尚未證明完整 Agent 的效益。
 
-第一版限單台 Burger、單一室內平面、預建地圖與人工命名地點，不辨識任意物體、不執行取放、不訓練端對端 RL。主要障礙物為雷射可偵測的固定物體；動態障礙物與實機長期運行列為後續延伸。
+### 2.5 研究範圍
 
-## 三、相關研究與研究缺口
+第一版限單台 Burger、單一室內平面、預建地圖與人工命名地點。不包含任意物體辨識、取放、多車協作或端對端 RL 訓練。導航採既有 Nav2；貢獻不包含新的路徑演算法。主要實驗障礙物應在雷射掃描平面內，動態障礙物與長期運行列為後續延伸。
 
-### 3.1 AI 技術研究
+## 三、相關研究與研究缺口 Related Work
 
-AI 文獻以 ReAct、SayCan 與 2025 年 ROS 2 語言互動研究為主 [1][2][3]。本組借鏡工具行動與觀測交替、依機器人能力限制任務，以及量測整合延遲的設計。LLM 初版採既有模型，不自行訓練；模型只輸出符合 schema 的任務與工具參數。
+### 3.1 語言代理與動作可行性
 
-### 3.2 領域知識研究
+ReAct [1] 以交替行動與觀測支持任務更新；本專題借鏡其回饋迴圈，但不將問答或互動基準成果視為實機導航證據。SayCan [2] 透過技能價值函數連結語言與機器人能力；本專題採用較受限的地點白名單及工具檢查，不複製其技能訓練，也不宣稱兩者方法等價。
 
-領域研究以 Nav2、SLAM Toolbox 與 BARN 的導航實作及測試為主 [4][5][6]。重點包括差速小車的車身範圍、地圖與定位、雷射限制、規劃與控制分工，以及狹窄環境的評估。AI 與領域文獻各三篇，後兩頁以相同八欄整理。
+Pollini 等人 [3] 在 Gazebo 中整合語言指令與 ROS 2，報告其架構的通訊延遲改善。這支持本專題記錄互動成本，但其模擬結果不能代表本組硬體效能，亦不能單憑該文推論歧義、取消或故障情境已被全面解決。
 
-### 3.3 證據強度與限制
+### 3.2 導航、建圖與評估
 
-文獻表區分作者已報告的成果與本組推論的適用限制。官方技術文件 [8]–[11] 補充介面與工程設定，不當成獨立實驗論文。NavBench 2025 [7] 作為跨平台評估的補充；其結果不能直接代表 Burger。較舊的基礎論文保留以交代方法來源，研究動機另納入 2025–2026 的資料 [3][7][12]。
+The Marathon 2 [4] 以 Nav2 行為樹協調導航；SLAM Toolbox [5] 提供建圖與定位工具。兩者支援底層空間處理，本專題則在其上處理命名地點與任務回報。BARN 2022 [6] 及 2026 官方挑戰 [12] 強調受限場景下的導航評估；本組借鏡多情境測試方式，不直接與不同車身平台的分數比較。
+
+補充文獻 RoboRAN [7] 建立跨平台的強化學習導航框架，支持統一任務與指標的價值。原提案以舊稱 RoboRAN 引用；本版依 arXiv:2505.14526v2 修正名稱。本專題不使用其訓練框架，也不直接套用其跨平台成果。
+
+### 3.3 文獻證據與本專題定位
+
+| 研究方向 | 可借鏡內容 | 對本專題的適用界線 |
+|---|---|---|
+| ReAct、SayCan [1][2] | 行動回饋與可行性約束 | 任務及平台不同，不是本組成功率或安全證明 |
+| ROS 2 語言互動 [3] | 整合架構與延遲量測 | 模擬設定不同，須重測本組端到端延遲 |
+| Nav2、SLAM Toolbox [4][5] | 導航協調、地圖與定位 | 不直接提供本組中文地點任務的評估結論 |
+| BARN、RoboRAN [6][7][12] | 固定場景、比較條件與可重現評估 | 車身、資料與任務不同，不能移用分數 |
+
+官方平台與 API 文件 [8]–[11] 用於工程設定，不當成獨立實驗論文。下列六篇文獻表保留 AI 與領域知識各三篇；限制欄是本組對適用範圍的判斷。
 
 ### 3.4 Existing Research → Limitations → Research Gap → Our Project
 
-| 層次 | 本專題歸納 |
-| --- | --- |
-| 現有研究 | 已有語言工具代理、技能可行性約束、模組化導航與標準化測試。 |
-| 適用限制 | 平台、任務與評估各異，不能直接得到本實驗室中文任務的可靠性結論。 |
-| 研究缺口 | 在固定 Burger／Nav2 條件下，任務澄清、狀態檢查與證據回報的增益尚待本組量測。 |
-| 本專題 | 以受限工具 Agent 串接上述流程，進行三組比較與兩項消融，揭露效益與失敗。 |
-
-研究問題 RQ1：Agent 是否降低歧義／未知目標的不當派送？RQ2：狀態檢查是否降低故障情境下的派送？RQ3：依事件紀錄生成回報，是否比直接語言轉目標更準確？
+現有研究已有語言代理、技能約束及成熟導航工具；本專題不以「沒有人做過語言導航」作為動機。真正待本組量測的是：固定導航底層後，中文地點澄清、前置狀態檢查與證據回報，是否改善任務處理，以及增加多少互動成本。後續以三組比較和兩項消融回答 RQ1–RQ3，並保留所有失敗與逾時。
 
 ## 3.5 Article Summary Table  AI 技術
 
@@ -139,7 +174,7 @@ AI 文獻以 ReAct、SayCan 與 2025 年 ROS 2 語言互動研究為主 [1][2][3
 
 意義：單次成功不能代表換地圖、加入障礙物或定位變差後仍可靠。整體任務要拆成語言、導航與回報三層評估。
 
-證據：BARN 和 NavBench 提倡標準化場景與可比較的導航評估 [6][7][12]。
+證據：BARN 和 RoboRAN 提倡標準化場景與可比較的導航評估 [6][7][12]。
 
 設計：固定基準設定、保留失敗與逾時，報告成功率及延遲分布；明確區分模擬與實機結果。
 
@@ -169,7 +204,7 @@ AI 文獻以 ReAct、SayCan 與 2025 年 ROS 2 語言互動研究為主 [1][2][3
 
 ### 雙方證據與可比較性
 
-A 的實際支持是 Nav2 的校園導航實驗 [4]；B 的支持是 NavBench 2025 展示 RL 策略跨多種平台的模擬及實體轉移 [7]。兩者使用不同任務，不能據此直接宣稱任一方全面勝出。BARN 2026 提供傳統、學習與混合方法共同測試的框架 [12]。
+A 的實際支持是 Nav2 的校園導航實驗 [4]；B 的支持是 RoboRAN 2025 展示 RL 策略跨多種平台的模擬及實體轉移 [7]。兩者使用不同任務，不能據此直接宣稱任一方全面勝出。BARN 2026 提供傳統、學習與混合方法共同測試的框架 [12]。
 
 ### 目前可採納的共同立場
 
@@ -335,9 +370,9 @@ Output: mission result R with evidence E
 15: while mission deadline has not expired:
 16:     read navigation feedback and fresh status; append evidence
 17:     if user cancels or status is unsafe/stale:
-18:         cancel goal; verify response; return CANCELED or FAULT
+18:         cancel goal; verify cancellation and stopping; return CANCELED or FAULT
 19:     if navigation result is SUCCEEDED:
-20:         return ARRIVED with action result and observed final pose
+20:         return ARRIVED if fresh final pose meets tolerances, else FAULT
 21:     if navigation result is FAILED or CANCELED:
 22:         if FAILED and retry budget remains and fresh checks pass:
 23:             recheck path; retry once only when a valid path exists
@@ -405,7 +440,7 @@ B0 固定地點選單＋相同 Nav2，提供物理導航及固定介面的參考
 
 ### 7.3 文件與交付標準
 
-Proposal 交付包含本報告、Proposal PPT、正式 GitHub Repository 與 DESIGN.md。隨附專案資料夾已準備上傳內容；遠端 Repository 網址與組員資料須由實際帳號及名單補上。期末另需完整程式、資料來源、可重現執行方式、實驗比較、超過 20 頁的 Final PPT 與超過 10 分鐘的 YouTube 簡報／Demo。
+Proposal 交付包含本報告、Proposal PPT、正式 GitHub Repository 與 DESIGN.md。正式 Repository：https://github.com/hank050392/tb3-navigation-agent；組員資料見 docs/TEAM.md。期末另需完整程式、資料來源、可重現執行方式、實驗比較、超過 20 頁的 Final PPT 與超過 10 分鐘的 YouTube 簡報／Demo。
 
 ### 7.4 AI 使用與限制
 
@@ -435,7 +470,7 @@ https://arxiv.org/abs/2208.10473
 
 ## 八、參考文獻 續
 
-[7] El-Hariry, M., et al. (2025). NavBench: A Unified Robotics Benchmark for Reinforcement Learning-Based Autonomous Navigation. arXiv:2505.14526.
+[7] El-Hariry, M., et al. (2025). RoboRAN: A Unified Robotics Framework for Reinforcement Learning-Based Autonomous Navigation. arXiv:2505.14526v2; accepted at TMLR.
 https://arxiv.org/abs/2505.14526
 
 [8] ROBOTIS (官方文件). TurtleBot3 Features and Navigation. 硬體規格與導航流程；實際 LDS 型號依實機確認.
@@ -455,3 +490,7 @@ https://people.cs.gmu.edu/~xiao/Research/BARN_Challenge/BARN_Challenge26.html
 
 網路來源查閱日期：2026 年 10 月 30 日。官方文件會更新；正式實驗需記錄實際套件版本與 commit。
 
+
+## 九、DIC3 規格與驗收導覽
+
+A–F、緒論與相關研究已於本版重整。五核心見 4.1，三取捨見 4.2.1–4.2.3，十個問題見 4.3。OpenSpec 操作、交付對照與原 DESIGN 轉換關係見 [DIC3_OPENSPEC.md](docs/DIC3_OPENSPEC.md)。現有功能的基準規格與待實作整合規格分開維護；CLI 驗證不等於實機驗收。

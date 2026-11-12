@@ -9,6 +9,12 @@
 
 [提案報告 PDF](docs/TB3_Proposal.pdf) · [提案簡報 PPTX](docs/TB3_Proposal.pptx) · [系統設計 DESIGN.md](DESIGN.md) · [實驗規畫](docs/EXPERIMENTS.md) · [參考資料](docs/REFERENCES.md)
 
+## DIC3：OpenSpec 提案改版（2026-11-12）
+
+本次改版入口：[DIC3 作業對照與操作](docs/DIC3_OPENSPEC.md) · [新版提案](PROPOSAL.md) · [OpenSpec 變更規畫](openspec/changes/refactor-tb3-proposal/proposal.md) · [驗證紀錄](docs/DIC3_VALIDATION.md)。
+
+已重整 A–F、中英文摘要、Introduction 與 Related Work，並將 DESIGN 轉為需求、情境、設計與任務清單。`openspec/specs/` 記錄既有離線契約，`openspec/changes/` 記錄待整合導航與評估規格。**文件已改版；LLM／ROS／Nav2 整合仍待完成。** `docs/TB3_Proposal.pdf` 和 `.pptx` 保留期中快照，新版文字以 `PROPOSAL.md` 為準。
+
 ## 目錄
 
 - [一、專題背景與目標](#一專題背景與目標)

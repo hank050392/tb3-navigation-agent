@@ -18,7 +18,7 @@ https://joss.theoj.org/papers/10.21105/joss.02783
 [6] Xiao, X., et al. (2022). Autonomous Ground Navigation in Highly Constrained Spaces: Lessons Learned from the BARN Challenge at ICRA 2022. IEEE Robotics & Automation Magazine; arXiv:2208.10473.
 https://arxiv.org/abs/2208.10473
 
-[7] El-Hariry, M., et al. (2025). NavBench: A Unified Robotics Benchmark for Reinforcement Learning-Based Autonomous Navigation. arXiv:2505.14526.
+[7] El-Hariry, M., et al. (2025). RoboRAN: A Unified Robotics Framework for Reinforcement Learning-Based Autonomous Navigation. arXiv:2505.14526v2; accepted at TMLR.
 https://arxiv.org/abs/2505.14526
 
 [8] ROBOTIS (官方文件). TurtleBot3 Features and Navigation. 硬體規格與導航流程；實際 LDS 型號依實機確認.
@@ -37,3 +37,14 @@ https://github.com/ros-navigation/navigation2/blob/main/nav2_collision_monitor/R
 https://people.cs.gmu.edu/~xiao/Research/BARN_Challenge/BARN_Challenge26.html
 
 查閱：2026-10-30。
+
+## DIC3 核對與工具來源（2026-11-12）
+
+- [1]–[7]：核對 arXiv／JOSS 原始來源的標題、方法摘要與平台範圍；[7] 依 v2 改為 RoboRAN。未將文獻成效當成本組結果。
+- [8]、[12]：核對 ROBOTIS 平台文件及 BARN 2026 官方頁面。
+- [9]–[11]：原提案保留的 API／調校參考；須依實際 ROS 發行版再核對，尚未作為本組已整合證據。
+- OpenSpec 官方專案：https://github.com/Fission-AI/OpenSpec
+- OpenSpec CLI 參考：https://github.com/Fission-AI/OpenSpec/blob/main/docs/cli.md
+- 教師示範：https://github.com/huanchen1107/2026-11-11-DIC3-ProjectRefactor
+
+本次使用 OpenSpec 2.0.0。舊教材可能使用不同 slash command；本專案說明採實際 CLI 的 new／status／validate／instructions 指令。
